@@ -1,0 +1,176 @@
+{
+  "users": [
+    [
+      "usr_demo_1",
+      {
+        "_id": "usr_demo_1",
+        "email": "candidate@interviewkit.io",
+        "passwordHash": "cf12dc87e06b15bd6135a8288103839f08d3e96580e9dcf2cb66f0db688f04ff",
+        "createdAt": "2026-09-24T07:13:04.642Z"
+      }
+    ]
+  ],
+  "kits": [
+    [
+      "kit_1790233994852_r3ih",
+      {
+        "_id": "kit_1790233994852_r3ih",
+        "userId": "usr_demo_1",
+        "status": "ready",
+        "source": {
+          "company": "Stripe",
+          "company_url": "https://stripe.com",
+          "role": "Senior Distributed Systems Engineer",
+          "days": 5,
+          "jd": "We are hiring a Senior Distributed Systems Engineer with Go and Raft experience to scale high-throughput ledger settlement and fault-tolerant financial primitives."
+        },
+        "kit": {
+          "source": {
+            "company": "Stripe",
+            "company_url": "https://stripe.com",
+            "role": "Senior Distributed Systems Engineer",
+            "location": "San Francisco, CA / Remote",
+            "jd_chars": 1520,
+            "researched_at": "2026-09-24T07:14:00.000Z",
+            "pages_used": ["https://stripe.com/about", "https://stripe.com/jobs"]
+          },
+          "company_brief": {
+            "summary": "Stripe builds economic infrastructure and global payment networks processing hundreds of billions of dollars annually.",
+            "what_they_do": "Financial infrastructure platform delivering APIs for payment processing, subscription billing, payout orchestration, and banking-as-a-service.",
+            "sources": ["https://stripe.com/about"]
+          },
+          "role": {
+            "title": "Senior Distributed Systems Engineer",
+            "seniority": "Senior",
+            "responsibilities": [
+              "Design high-throughput, low-latency consensus clusters using Raft and Go",
+              "Maintain multi-region database replications with strict linearizability guarantees",
+              "Architect idempotent transactional APIs handling hundreds of thousands of operations per second"
+            ],
+            "requirements": [
+              { "id": "r1", "text": "Deep expertise with distributed consensus algorithms (Raft, Paxos)", "kind": "technical", "priority": "must" },
+              { "id": "r2", "text": "Production experience in Go building high-concurrency microservices", "kind": "technical", "priority": "must" },
+              { "id": "r3", "text": "Cross-functional architectural ownership and incident response leadership", "kind": "behavioural", "priority": "must" },
+              { "id": "r4", "text": "Knowledge of financial ledger reconciliation and two-phase commit protocols", "kind": "technical", "priority": "should" }
+            ]
+          },
+          "questions": [
+            {
+              "id": "q1",
+              "requirement_ids": ["r1", "r2"],
+              "category": "technical",
+              "subcategory": "Concurrency & Thread Safety",
+              "prompt": "How does the Raft consensus algorithm handle network partitions, and how do you prevent split-brain scenarios during leader elections in Go?",
+              "answer_outline": "Explain randomized election timeouts, majority quorums (N/2 + 1), term counter comparisons, and log replication invariants.",
+              "expert_answer": "In Raft, safety during network partitions is guaranteed through the strict requirement of majority quorums (floor(N/2) + 1) for both leader election and entry commitment. When a partition divides a 5-node cluster into {Node A, Node B} and {Node C, Node D, Node E}:\n\n1. The minority partition ({A, B}) cannot elect a leader or commit any new entries because it cannot obtain 3 affirmative votes.\n2. The majority partition ({C, D, E}) can elect a new leader by bumping the term counter.\n3. Upon healing, the old leader receives AppendEntriesRPC from the higher-term leader, steps down immediately to follower state, and overwrites uncommitted conflicting log entries with the canonical log.\n\nIn Go, this is implemented using channels for non-blocking RPC dispatch, atomic term updates via sync/atomic, and a state mutex protecting term transitions.",
+              "difficulty": 3,
+              "citations": [
+                {
+                  "title": "In Search of an Understandable Consensus Algorithm (Extended Raft Paper)",
+                  "url": "https://raft.github.io/raft.pdf",
+                  "domain": "raft.github.io",
+                  "snippet": "Raft decomposes consensus into leader election, log replication, and safety, enforcing that only nodes with up-to-date logs can become leaders."
+                }
+              ]
+            },
+            {
+              "id": "q2",
+              "requirement_ids": ["r1", "r4"],
+              "category": "system-design",
+              "subcategory": "System Design & Distributed Architecture",
+              "prompt": "Design an idempotent ledger transaction engine that guarantees exactly-once payment processing semantics across distributed service boundaries.",
+              "answer_outline": "Detail idempotency key caching, distributed transactions with two-phase commit (2PC) or Saga patterns, database unique constraints, and replay safety.",
+              "expert_answer": "An idempotent financial ledger requires multi-tier defense against duplicate execution:\n\n1. API Gateway Layer: The client supplies an Idempotency-Key HTTP header. The gateway performs an atomic CAS on Redis with a 24-hour TTL.\n2. Mutation Locking: If the key exists with status 'in_progress', subsequent concurrent calls receive HTTP 409 Conflict. If 'completed', the cached payload is returned directly.\n3. Persistence Layer: The transaction is committed inside a relational database (PostgreSQL) using a double-entry bookkeeping schema with a unique constraint on (account_id, idempotency_key).\n4. Distributed Coordination: Inter-service operations utilize the Saga pattern with outbox messaging to ensure eventual consistency across payment rails.",
+              "difficulty": 3,
+              "citations": [
+                {
+                  "title": "Designing Idempotent APIs in Distributed Systems",
+                  "url": "https://stripe.com/blog/idempotency",
+                  "domain": "stripe.com",
+                  "snippet": "Stripe uses idempotency keys to ensure transactions are processed only once despite retries over unreliable networks."
+                }
+              ]
+            },
+            {
+              "id": "q3",
+              "requirement_ids": ["r3"],
+              "category": "behavioural",
+              "subcategory": "Leadership & Ownership",
+              "prompt": "Describe a SEV-0 or SEV-1 production incident in a distributed system that you led, diagnosed, and resolved under tight business constraints.",
+              "answer_outline": "STAR framework: Context of distributed failure, immediate mitigation steps, diagnostic root-cause analysis, communication cadence, and post-mortem safeguards.",
+              "expert_answer": "Situation: During a Black Friday traffic surge, our payment gateway encountered a cascading connection-pool exhaustion issue causing a 40% error rate.\n\nTask: As technical incident commander, I had to stabilize payment processing within 15 minutes while preserving financial data consistency.\n\nAction: 1) Implemented graceful degradation by tripping circuit breakers on non-critical analytics pipelines; 2) Scaled the database read-replicas and shed speculative traffic using adaptive load shedding; 3) Maintained a 10-minute executive briefing cadence.\n\nResult: Full API recovery within 12 minutes with 0% data loss. Authored a comprehensive post-mortem leading to connection pool circuit breaking and automated chaos engineering drills.",
+              "difficulty": 2,
+              "citations": [
+                {
+                  "title": "Google SRE Book - Managing Incidents",
+                  "url": "https://sre.google/sre-book/managing-incidents/",
+                  "domain": "sre.google",
+                  "snippet": "Best practices for incident command, clear communication channels, and blameless postmortems."
+                }
+              ]
+            }
+          ],
+          "flashcards": [
+            {
+              "id": "f1",
+              "requirement_ids": ["r1"],
+              "front": "What is the Raft Log Matching Property and how is it preserved?",
+              "back": "If two logs contain an entry with the same index and term, they are identical up to that point. It is preserved because leaders only append entries and followers reject non-matching logs."
+            },
+            {
+              "id": "f2",
+              "requirement_ids": ["r2"],
+              "front": "How do Go channels prevent goroutine leaks in distributed worker pools?",
+              "back": "By binding channel listeners to a context.Context with Done() signaling and avoiding unbuffered writes when receivers might exit early."
+            },
+            {
+              "id": "f3",
+              "requirement_ids": ["r4"],
+              "front": "What is the primary difference between Two-Phase Commit (2PC) and the Saga pattern?",
+              "back": "2PC provides atomic distributed ACID consistency via synchronous participant locking, whereas Saga provides eventual consistency across microservices via asynchronous local transactions and compensating actions."
+            }
+          ],
+          "schedule": {
+            "days_available": 5,
+            "days": [
+              { "day": 1, "focus": "Distributed Consensus & Raft Invariants", "question_ids": ["q1"], "minutes": 45 },
+              { "day": 2, "focus": "Idempotent Financial Systems & System Design", "question_ids": ["q2"], "minutes": 45 },
+              { "day": 3, "focus": "Production Incident Leadership & STAR Drills", "question_ids": ["q3"], "minutes": 40 },
+              { "day": 4, "focus": "Flashcard Spaced Repetition & Weak Spots", "question_ids": ["q1", "q2"], "minutes": 35 },
+              { "day": 5, "focus": "Final Mock Interview & Executive Delivery Polish", "question_ids": ["q1", "q2", "q3"], "minutes": 30 }
+            ]
+          },
+          "coverage": {
+            "uncovered_requirement_ids": [],
+            "passes": 3
+          }
+        },
+        "draftState": {
+          "items": {
+            "q1": { "origin": "generated" },
+            "q2": { "origin": "generated" },
+            "q3": { "origin": "generated" },
+            "f1": { "origin": "generated" },
+            "f2": { "origin": "generated" },
+            "f3": { "origin": "generated" }
+          },
+          "tombstones": []
+        },
+        "createdAt": "2026-09-24T07:13:14.852Z",
+        "updatedAt": "2026-09-24T12:20:00.000Z",
+        "generationJob": {
+          "stage": "completed",
+          "progress": 100,
+          "message": "Prep kit is ready!"
+        }
+      }
+    ]
+  ],
+  "sessions": [
+    [
+      "demo_session_token",
+      "usr_demo_1"
+    ]
+  ],
+  "practiceLogs": []
+}

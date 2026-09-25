@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@keyframes auroraFlow {
+  0% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+    filter: hue-rotate(0deg);
+  }
+  33% {
+    background-position: 100% 0%, 0% 100%, 80% 50%;
+    filter: hue-rotate(30deg);
+  }
+  66% {
+    background-position: 50% 100%, 50% 0%, 20% 80%;
+    filter: hue-rotate(60deg);
+  }
+  100% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+    filter: hue-rotate(0deg);
+  }
+}
+
+@keyframes floatOrb1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate(120px, 70px) scale(1.15) rotate(45deg);
+  }
+  50% {
+    transform: translate(40px, 140px) scale(0.92) rotate(90deg);
+  }
+  75% {
+    transform: translate(-80px, 60px) scale(1.08) rotate(135deg);
+  }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate(-140px, -80px) scale(1.12) rotate(-60deg);
+  }
+  50% {
+    transform: translate(60px, -120px) scale(0.88) rotate(-120deg);
+  }
+  75% {
+    transform: translate(100px, 40px) scale(1.2) rotate(-180deg);
+  }
+}
+
+@keyframes floatOrb3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(100px, -110px) scale(1.22);
+  }
+  66% {
+    transform: translate(-120px, 80px) scale(0.9);
+  }
+}
+
+@keyframes floatOrb4 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-90px, -90px) scale(1.25);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.animate-aurora-flow {
+  animation: auroraFlow 24s ease-in-out infinite;
+  background-size: 200% 200%, 250% 250%, 200% 200%;
+}
+
+.animate-float-orb-1 {
+  animation: floatOrb1 28s ease-in-out infinite;
+}
+
+.animate-float-orb-2 {
+  animation: floatOrb2 34s ease-in-out infinite;
+}
+
+.animate-float-orb-3 {
+  animation: floatOrb3 30s ease-in-out infinite;
+}
+
+.animate-float-orb-4 {
+  animation: floatOrb4 38s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 8s ease-in-out infinite;
+}

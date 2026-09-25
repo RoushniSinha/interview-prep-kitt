@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Authenticated candidate profile",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique identifier of the candidate matching Firebase Auth UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Verified candidate email address",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Candidate full name or display handle",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Account registration timestamp"
+        }
+      },
+      "required": ["userId", "email"]
+    },
+    "Kit": {
+      "title": "Kit",
+      "description": "Autonomous multi-step interview prep kit document",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique kit identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner candidate UID",
+          "maxLength": 128
+        },
+        "source": {
+          "type": "object",
+          "description": "Origin JD, company metadata, and research crawl sources"
+        },
+        "company_brief": {
+          "type": "object",
+          "description": "Synthesized company culture, tech stack, and verified sources"
+        },
+        "role": {
+          "type": "object",
+          "description": "Deconstructed role requirements and responsibilities"
+        },
+        "questions": {
+          "type": "array",
+          "description": "Curated interview practice questions with difficulty and outlines"
+        },
+        "flashcards": {
+          "type": "array",
+          "description": "Targeted active-recall flashcards for requirements coverage"
+        },
+        "schedule": {
+          "type": "object",
+          "description": "Deterministic daily study schedule"
+        },
+        "coverage": {
+          "type": "object",
+          "description": "Requirements coverage report"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of kit creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of latest revision"
+        }
+      },
+      "required": ["userId", "source", "company_brief", "role", "questions", "flashcards", "schedule", "coverage"]
+    },
+    "TestConnection": {
+      "title": "TestConnection",
+      "description": "Connection test doc for validating Firestore reachability",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Status message",
+          "maxLength": 64
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of candidate profiles partitioned by user UID"
+    },
+    "/kits/{kitId}": {
+      "schema": "Kit",
+      "description": "Collection of candidate interview preparation kits partitioned by owner"
+    },
+    "/test/{testId}": {
+      "schema": "TestConnection",
+      "description": "Public readable test doc for verifying Firestore connectivity on boot"
+    }
+  }
+}

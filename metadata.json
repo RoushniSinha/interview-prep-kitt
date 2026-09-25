@@ -1,0 +1,8 @@
+{
+  "name": "Interview Prep Kit",
+  "description": "Full-stack automated interview preparation kit generator, company research intelligence, deterministic scheduling, and practice arena.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

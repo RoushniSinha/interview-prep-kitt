@@ -1,0 +1,208 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-09-24T02:45:53.382Z",
+  "kits": [
+    {
+      "id": "case_test_stripe",
+      "status": "ok",
+      "kit": {
+        "source": {
+          "company": "Company",
+          "company_url": "https://company.example",
+          "role": "Senior Infrastructure Engineer",
+          "location": "Remote",
+          "jd_chars": 186,
+          "researched_at": "2026-09-24T02:45:53.374Z",
+          "pages_used": [
+            "https://news.ycombinator.com/item?id=Company"
+          ]
+        },
+        "company_brief": {
+          "summary": "Automated intelligence scan for Target Company. Public website information was inaccessible or unavailable during crawl; preparation is anchored primarily on the provided Job Description.",
+          "what_they_do": "Specific product and engineering telemetry was not discoverable from the provided domain (none). Focus on core role responsibilities and stated technical domains.",
+          "sources": [
+            "https://news.ycombinator.com/item?id=Company"
+          ]
+        },
+        "role": {
+          "title": "Senior Infrastructure Engineer",
+          "seniority": "Senior",
+          "responsibilities": [
+            "Design and maintain highly reliable distributed services",
+            "Lead architectural initiatives and code quality reviews"
+          ],
+          "requirements": [
+            {
+              "id": "r1",
+              "text": "Distributed systems experience in Go or Java",
+              "kind": "technical",
+              "priority": "must"
+            },
+            {
+              "id": "r2",
+              "text": "Mastery of consensus protocols (Raft, Paxos)",
+              "kind": "technical",
+              "priority": "must"
+            },
+            {
+              "id": "r3",
+              "text": "Zero-downtime database migration under high load",
+              "kind": "technical",
+              "priority": "must"
+            },
+            {
+              "id": "r4",
+              "text": "Experience with Kubernetes container orchestration",
+              "kind": "technical",
+              "priority": "nice"
+            }
+          ]
+        },
+        "questions": [
+          {
+            "id": "q1",
+            "requirement_ids": [
+              "r1"
+            ],
+            "category": "technical",
+            "prompt": "How would you architect a distributed, idempotent service fulfilling requirement r1 with guaranteed at-least-once message processing?",
+            "answer_outline": "High-scoring answer addresses two-phase commit, unique idempotency keys in Redis, dead-letter queues, quorum consistency, and atomic database transactions.",
+            "difficulty": 1
+          },
+          {
+            "id": "q2",
+            "requirement_ids": [
+              "r2"
+            ],
+            "category": "technical",
+            "prompt": "Walk through a critical production incident concerning r2. How did you diagnose, resolve, and establish observability alerts?",
+            "answer_outline": "High-scoring answer addresses two-phase commit, unique idempotency keys in Redis, dead-letter queues, quorum consistency, and atomic database transactions.",
+            "difficulty": 2
+          },
+          {
+            "id": "q3",
+            "requirement_ids": [
+              "r3"
+            ],
+            "category": "technical",
+            "prompt": "Walk through a critical production incident concerning r3. How did you diagnose, resolve, and establish observability alerts?",
+            "answer_outline": "High-scoring answer addresses two-phase commit, unique idempotency keys in Redis, dead-letter queues, quorum consistency, and atomic database transactions.",
+            "difficulty": 3
+          },
+          {
+            "id": "q4",
+            "requirement_ids": [
+              "r4"
+            ],
+            "category": "technical",
+            "prompt": "Walk through a critical production incident concerning r4. How did you diagnose, resolve, and establish observability alerts?",
+            "answer_outline": "High-scoring answer addresses two-phase commit, unique idempotency keys in Redis, dead-letter queues, quorum consistency, and atomic database transactions.",
+            "difficulty": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "id": "f1",
+            "front": "How do you achieve idempotency in distributed message processing (at-least-once delivery)?",
+            "back": "1. Attach unique idempotency keys to incoming payloads.\n2. Deduplicate using atomic Redis SETNX or unique DB constraints.\n3. Wrap state updates and outbox events in a single local database transaction.\n4. Route poison pills to a Dead Letter Queue (DLQ) after retry exhaustion.",
+            "requirement_ids": [
+              "r1"
+            ]
+          },
+          {
+            "id": "f2",
+            "front": "What key properties guarantee leader election safety and correctness in Raft?",
+            "back": "1. Election Timeout: Randomized to prevent split-vote deadlocks.\n2. Quorum Requirement: Must receive votes from a majority ((N/2) + 1) of nodes.\n3. Log Completeness: Voters reject candidates whose log is less up-to-date than their own.",
+            "requirement_ids": [
+              "r2"
+            ]
+          },
+          {
+            "id": "f3",
+            "front": "How do you resolve a network partition causing split-brain in Raft?",
+            "back": "Minority partitions cannot reach quorum for log commits and will continuously fail or queue requests. When the partition heals, the partitioned leader steps down upon seeing higher term heartbeats from the majority partition, overwriting conflicting uncommitted entries.",
+            "requirement_ids": [
+              "r2"
+            ]
+          },
+          {
+            "id": "f4",
+            "front": "Outline the 4-phase Expand/Contract pattern for zero-downtime database schema migrations.",
+            "back": "1. Expand: Add new nullable/default column or parallel table.\n2. Dual-Write: Write to both old and new schema in code; read from old.\n3. Backfill: Migrate historical data asynchronously in batches.\n4. Contract: Switch reads to new schema, stop dual-writing, and drop old column/table.",
+            "requirement_ids": [
+              "r3"
+            ]
+          },
+          {
+            "id": "f5",
+            "front": "How do you handle schema changes with zero downtime under heavy write contention?",
+            "back": "1. Use online DDL tools (e.g., gh-ost, pt-online-schema-change) that operate via binlog replication instead of table locks.\n2. Avoid default values with table rewrites.\n3. Add indices concurrently (e.g., PostgreSQL CREATE INDEX CONCURRENTLY).",
+            "requirement_ids": [
+              "r3"
+            ]
+          },
+          {
+            "id": "f6",
+            "front": "In Kubernetes, what is the operational difference between readiness and liveness probes during rollouts?",
+            "back": "• Liveness Probe: Detects deadlocks/hangs; failure triggers pod restart.\n• Readiness Probe: Verifies if pod can accept traffic; failure isolates pod from Service endpoints to prevent 5xx errors during cold starts or warmups.",
+            "requirement_ids": [
+              "r4"
+            ]
+          },
+          {
+            "id": "f7",
+            "front": "How do you achieve graceful termination in Go/Java microservices deployed to Kubernetes?",
+            "back": "1. Catch SIGTERM signal.\n2. Delay shutdown briefly (or sleep) to allow kube-proxy/ingress endpoint updates.\n3. Stop accepting new connections.\n4. Complete in-flight requests within terminationGracePeriodSeconds before closing DB pools.",
+            "requirement_ids": [
+              "r1",
+              "r4"
+            ]
+          },
+          {
+            "id": "f8",
+            "front": "What is the difference between Raft commit index and applied index?",
+            "back": "• Commit Index: Highest log entry known to be replicated across a quorum of nodes.\n• Applied Index: Highest log entry executed against the local finite-state machine (FSM). Applied index must never exceed commit index.",
+            "requirement_ids": [
+              "r2"
+            ]
+          }
+        ],
+        "schedule": {
+          "days_available": 3,
+          "days": [
+            {
+              "day": 1,
+              "focus": "Technical Deep Dive",
+              "question_ids": [
+                "q3",
+                "q4"
+              ],
+              "minutes": 60
+            },
+            {
+              "day": 2,
+              "focus": "Technical Deep Dive",
+              "question_ids": [
+                "q2"
+              ],
+              "minutes": 30
+            },
+            {
+              "day": 3,
+              "focus": "Final Review & High-Yield Rehearsal",
+              "question_ids": [
+                "q1"
+              ],
+              "minutes": 15
+            }
+          ]
+        },
+        "coverage": {
+          "uncovered_requirement_ids": [],
+          "passes": 1
+        }
+      },
+      "error": null
+    }
+  ]
+}

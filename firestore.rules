@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Catch-All Safety Net: Default-Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'google.com');
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['userId', 'email']) &&
+        data.keys().hasOnly(['userId', 'email', 'displayName', 'createdAt', 'updatedAt']) &&
+        data.userId == request.auth.uid &&
+        data.email is string && data.email.size() <= 256 &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 128));
+    }
+
+    function isValidKit(data) {
+      return data.keys().hasAll(['userId', 'source', 'company_brief', 'role', 'questions', 'flashcards', 'schedule', 'coverage']) &&
+        data.userId == request.auth.uid &&
+        data.source is map &&
+        data.company_brief is map &&
+        data.role is map &&
+        data.questions is list && data.questions.size() <= 100 &&
+        data.flashcards is list && data.flashcards.size() <= 150 &&
+        data.schedule is map &&
+        data.coverage is map;
+    }
+
+    // Healthcheck Test Collection
+    match /test/{testId} {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
+    // User Profile Store (Strict PII Isolation)
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId);
+      allow list: if false;
+      allow create: if isSignedIn() && isVerified() && isValidId(userId) && request.auth.uid == userId && isValidUser(incoming());
+      allow update: if isSignedIn() && isVerified() && isValidId(userId) && request.auth.uid == userId && isValidUser(incoming()) && incoming().userId == existing().userId && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    // Interview Preparation Kits Store
+    match /kits/{kitId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isVerified() && isValidId(kitId) && isValidKit(incoming()) && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && isVerified() && isValidId(kitId) && isValidKit(incoming()) && incoming().userId == existing().userId && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(kitId) && existing().userId == request.auth.uid;
+    }
+  }
+}
