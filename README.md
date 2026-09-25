@@ -11,6 +11,11 @@
 > The live deployment runs in production on **Google Cloud Run (`asia-east1`)**, connected to a high-availability **MongoDB Atlas** cluster for atomic document persistence and integrated with **Google Cloud Vertex AI Discovery Engine** for enterprise-grade web-grounded search retrieval and requirement synthesis.
 
 ---
+<img width="1752" height="936" alt="image" src="https://github.com/user-attachments/assets/fe13e6af-c09a-45e5-9451-53a18c30bc22" />
+<img width="1027" height="897" alt="image" src="https://github.com/user-attachments/assets/7b0e89c2-5346-4115-9e5a-45e1612965a2" />
+<img width="1655" height="953" alt="image" src="https://github.com/user-attachments/assets/513683d9-d8b3-48e7-b962-e7284da58a4b" />
+
+---
 
 ## Table of Contents
 1. [Project Overview & Tech Stack Justification](#1-project-overview--tech-stack-justification)
